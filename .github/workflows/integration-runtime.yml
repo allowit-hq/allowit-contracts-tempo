@@ -20,9 +20,11 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - id: lock
+        run: echo "foundry=v$(jq -er .foundryVersion dependencies.lock.json)" >> "$GITHUB_OUTPUT"
       - uses: foundry-rs/foundry-toolchain@908c540300062bd5a7e473851cdb4282204cee09
         with:
-          version: v1.8.5
+          version: ${{ steps.lock.outputs.foundry }}
       - name: Install pinned dependencies and build
         run: scripts/build.sh
       - name: Smoke native TIP20 fund, transfer and recovery
