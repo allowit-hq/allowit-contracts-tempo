@@ -28,6 +28,10 @@ jobs:
       - uses: foundry-rs/foundry-toolchain@908c540300062bd5a7e473851cdb4282204cee09
         with:
           version: ${{ steps.lock.outputs.foundry }}
+      - name: Install Rust
+        run: rustup toolchain install 1.98.0 --profile minimal
       - run: scripts/build.sh
+        env:
+          RUSTUP_TOOLCHAIN: 1.98.0
       - run: forge fmt --check
       - run: forge test --network tempo --fuzz-runs 512 --no-match-path test/TempoNative.t.sol

@@ -1,0 +1,28 @@
+name: Tempo Rust crates
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: allowit-tempo-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RUSTUP_TOOLCHAIN: 1.98.0
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Install Rust
+        run: rustup toolchain install 1.98.0 --profile minimal --component rustfmt --component clippy
+      - name: Check formatting
+        run: cargo fmt --manifest-path rust/Cargo.toml --all --check
+      - name: Check offline verifier and host services
+        run: cargo test --manifest-path rust/Cargo.toml --workspace --locked
+      - name: Check executor and recovery
+        run: cargo test --manifest-path rust/Cargo.toml --locked -p allowit-tempo --features client
+      - name: Lint
+        run: cargo clippy --manifest-path rust/Cargo.toml --workspace --locked --all-targets --all-features -- -D warnings
