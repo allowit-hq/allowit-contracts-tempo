@@ -205,8 +205,8 @@ When you read `getState()`, treat `spentToday` as zero if `spendDay` is behind t
 `rust/` is one Cargo workspace with one lockfile and one version: `allowit-tempo` and its member `allowit-tempo-services`. [Allowit core](https://github.com/allowit-hq/allowit-core) (package `allowit-sdk`) is the only git dependency. It is declared once in `rust/Cargo.toml`, and `[workspace.metadata.allowit.track]` says which commit it must be pinned to: `"head"` (the default branch tip), `{ branch = "name" }` or `{ version = "1.2.3" }` (tag `v1.2.3`).
 
 ```sh
-scripts/build.sh            # fail on a stale allowit-core pin, then build the Rust workspace and the contracts
-scripts/build.sh --check    # only check the pin
+scripts/build.sh            # fail on a stale allowit-core pin or a second copy of a git package in rust/Cargo.lock, then build the Rust workspace and the contracts
+scripts/build.sh --check    # only check the pin and rust/Cargo.lock
 scripts/build.sh --update   # move a stale pin to its tracked commit, refresh rust/Cargo.lock, then build
 ```
 
