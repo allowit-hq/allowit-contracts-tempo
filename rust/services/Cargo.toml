@@ -6,6 +6,11 @@ rust-version = "1.98"
 license = "LicenseRef-Proprietary"
 publish = false
 
+[package.metadata.allowit-source]
+repository = "https://github.com/allowit-hq/allowit-engine"
+revision = "8cbd4625b170ae72aa470a642f19a55b2f40e9a3"
+path = "crates/server/crates/engine/src/tempo_transaction.rs"
+
 [dependencies]
 allowit-sdk = { workspace = true, features = ["service", "transport"] }
 k256 = { version = "0.13", features = ["ecdsa"] }

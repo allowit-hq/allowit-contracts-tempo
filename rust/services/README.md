@@ -41,4 +41,4 @@ cargo test --manifest-path rust/services/Cargo.toml --locked
 
 ## Provenance and license
 
-The transaction implementation is copied from the Allowit engine. The crate declares `LicenseRef-Proprietary`; the rest of this repository is [MIT](../../LICENSE).
+The transaction implementation is copied from the Allowit engine. Its source repository, revision and path are recorded under `[package.metadata.allowit-source]` in [`Cargo.toml`](Cargo.toml). The crate declares `LicenseRef-Proprietary`; the rest of this repository is [MIT](../../LICENSE).
