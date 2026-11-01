@@ -208,7 +208,10 @@ When you read `getState()`, treat `spentToday` as zero if `spendDay` is behind t
 scripts/build.sh            # fail on a stale allowit-core pin or a second copy of a git package in rust/Cargo.lock, then build the Rust workspace and the contracts
 scripts/build.sh --check    # only check the pin and rust/Cargo.lock
 scripts/build.sh --update   # move a stale pin to its tracked commit, refresh rust/Cargo.lock, then build
+scripts/build.sh --update allowit-core   # move only the pins of the named repositories
 ```
+
+Every mode fails when `rust/Cargo.lock` no longer matches the manifests.
 
 The script needs `git`, `cargo`, `jq` and `forge`.
 
