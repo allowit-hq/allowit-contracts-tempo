@@ -672,44 +672,30 @@ mod tests {
         );
     }
     #[test]
-    fn capability_gateway_failure_or_redirect_never_retries_or_echoes_secret() {
+    fn capability_failure_redirect_or_lost_response_never_retries_or_echoes_secret() {
         use crate::client::tests::{Reply, serve};
-        for status in [302, 403, 503] {
-            let (client, server) = serve(vec![
-                Reply::Status(
+        for status in [Some(302), Some(403), Some(503), None] {
+            let first = match status {
+                Some(status) => Reply::Status(
                     status,
                     r#"{"error":"tempo-executor.secret private-request"}"#,
                 ),
-                Reply::Status(200, "{}"),
-            ]);
+                None => Reply::Close,
+            };
+            let (client, server) = serve(vec![first, Reply::Status(200, "{}")]);
             let bundle = Bundle {
                 value: json!({}),
                 origin: client.cfg.origin.clone(),
                 capability: format!("tempo-executor.{}", "a".repeat(32)),
             };
             let error = bundle
-                .call("report", json!({"requestId":"private-request"}))
+                .call("execute", json!({"requestId":"private-request"}))
                 .unwrap_err();
-            assert_eq!(error.code, 5);
+            assert_eq!(error.code, 5, "{status:?}");
             assert!(!error.message.contains("private-request"));
             assert!(!error.message.contains("secret"));
-            assert_eq!(server.finish().len(), 1);
+            assert_eq!(server.finish().len(), 1, "{status:?}");
         }
-    }
-    #[test]
-    fn lost_capability_response_never_retries_or_reports_settlement() {
-        use crate::client::tests::{Reply, serve};
-        let (client, server) = serve(vec![Reply::Close, Reply::Status(200, "{}")]);
-        let bundle = Bundle {
-            value: json!({}),
-            origin: client.cfg.origin.clone(),
-            capability: format!("tempo-executor.{}", "a".repeat(32)),
-        };
-        let error = bundle
-            .call("execute", json!({"requestId":"request-1"}))
-            .unwrap_err();
-        assert_eq!(error.code, 5);
-        assert_eq!(server.finish().len(), 1);
     }
     #[test]
     fn a_capability_never_calls_owner_lifecycle_routes() {

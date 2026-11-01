@@ -67,9 +67,9 @@ forge test --network tempo -vv
 ```
 
 > [!TIP]
-> `forge test --network tempo` runs the Tempo precompiles, so the suite in [`test/TempoNative.t.sol`](test/TempoNative.t.sol) can create a real TIP-20 token, pause it, blacklist a recipient and prove the vault rolls back cleanly each time. For a local node, run `anvil --network tempo --host 127.0.0.1`.
+> `forge test --network tempo` runs the Tempo precompiles, so the suite in [`test/TempoNative.t.sol`](test/TempoNative.t.sol) can create a real TIP-20 token, blacklist a recipient and prove the vault rolls back cleanly each time. For a local node, run `anvil --network tempo --host 127.0.0.1`.
 
-The test suite covers authorization, every binding substitution, replay, nonce order, expiry boundaries, the five-minute attestation window, total and daily caps across day rollover, fixed recipients, semantic assessments, tuning, revocation, owner recovery, token failures, reentrancy, factory atomicity and fuzzed conservation. Two invariants check that caps and nonces always hold and that tokens are conserved with owner-only recovery.
+The test suite covers authorization, every binding substitution, replay, nonce order, expiry boundaries, the five-minute attestation window, total and daily caps across day rollover, fixed recipients, semantic assessments, tuning, revocation, owner recovery, token failures, reentrancy, factory atomicity and conservation. Two invariants check that caps and nonces always hold and that tokens are conserved with owner-only recovery.
 
 ## Deploy to Moderato testnet
 
