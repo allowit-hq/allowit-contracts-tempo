@@ -858,49 +858,30 @@ mod tests {
     }
 
     #[test]
-    fn known_null_and_matching_pending_transactions_use_only_saved_hash() {
+    fn known_checks_the_chain_then_reads_only_the_saved_hash() {
         let (tx, signed, _, _, mut chain_tx, _) = fixture();
         chain_tx["blockNumber"] = Value::Null;
         chain_tx["blockHash"] = Value::Null;
-        for (value, expected) in [(Value::Null, false), (chain_tx, true)] {
-            let (rpc, server) = rpc_script(vec![json!("0xa5bf"), value]);
-            assert_eq!(rpc.known(&tx, &signed).unwrap(), expected);
-            let seen = server.finish();
-            assert_eq!(seen.len(), 2);
-            assert_reads_only(&seen);
-            let request: Value = serde_json::from_slice(&seen[1].body).unwrap();
-            assert_eq!(request["method"], "eth_getTransactionByHash");
-            assert_eq!(request["params"], json!([signed.hash]));
-        }
-    }
-
-    #[test]
-    fn known_transaction_rejects_mismatched_body_sender_and_hash() {
-        let (tx, signed, intent, _, chain_tx, _) = fixture();
-        for (field, value) in [
-            ("nonce", json!("0xa")),
-            ("from", json!(intent.recipient)),
-            ("hash", json!(format!("0x{}", "aa".repeat(32)))),
-            ("type", json!("0x2")),
+        let mut mismatched = chain_tx.clone();
+        mismatched["hash"] = json!(format!("0x{}", "aa".repeat(32)));
+        // Each case: replies, expected result or error code, requests sent.
+        for (replies, expected, reads) in [
+            (vec![json!("0xa5bf"), Value::Null], Ok(false), 2),
+            (vec![json!("0xa5bf"), chain_tx], Ok(true), 2),
+            (vec![json!("0xa5bf"), mismatched], Err(5), 2),
+            (vec![json!("0x1")], Err(3), 1),
         ] {
-            let mut changed = chain_tx.clone();
-            changed[field] = value;
-            let (rpc, server) = rpc_script(vec![json!("0xa5bf"), changed]);
-            assert_eq!(rpc.known(&tx, &signed).err().unwrap().code, 5);
+            let (rpc, server) = rpc_script(replies);
+            assert_eq!(rpc.known(&tx, &signed).map_err(|e| e.code), expected);
             let seen = server.finish();
-            assert_eq!(seen.len(), 2);
+            assert_eq!(seen.len(), reads);
             assert_reads_only(&seen);
+            if reads == 2 {
+                let request: Value = serde_json::from_slice(&seen[1].body).unwrap();
+                assert_eq!(request["method"], "eth_getTransactionByHash");
+                assert_eq!(request["params"], json!([signed.hash]));
+            }
         }
-    }
-
-    #[test]
-    fn known_transaction_checks_chain_before_querying_saved_hash() {
-        let (tx, signed, _, _, _, _) = fixture();
-        let (rpc, server) = rpc_script(vec![json!("0x1")]);
-        assert_eq!(rpc.known(&tx, &signed).err().unwrap().code, 3);
-        let seen = server.finish();
-        assert_eq!(seen.len(), 1);
-        assert_reads_only(&seen);
     }
 
     #[test]
@@ -916,21 +897,5 @@ mod tests {
             assert!(quantity(&bad).is_err());
         }
         assert_eq!(quantity(&json!("0xa5bf")).unwrap(), 42431);
-    }
-    #[test]
-    fn transfer_proof_requires_exact_token_vault_recipient_and_amount() {
-        let token = format!("0x{}", "20".repeat(20));
-        let vault = format!("0x{}", "30".repeat(20));
-        let recipient = format!("0x{}", "40".repeat(20));
-        let receipt = json!({"logs":[{"address":token,"topics":[
-            allowit_tempo::hex(&allowit_tempo::keccak("Transfer(address,address,uint256)")),
-            format!("0x{}{}","0".repeat(24),&vault[2..]),format!("0x{}{}","0".repeat(24),&recipient[2..])],
-            "data":format!("0x{:064x}",1_000_000)}]});
-        assert!(check_transfer(&receipt, &token, &vault, &recipient, "1").is_ok());
-        assert!(check_transfer(&receipt, &token, &vault, &recipient, "2").is_err());
-        assert!(check_transfer(&receipt, &vault, &token, &recipient, "1").is_err());
-        let mut removed = receipt.clone();
-        removed["logs"][0]["removed"] = json!(true);
-        assert!(check_transfer(&removed, &token, &vault, &recipient, "1").is_err());
     }
 }

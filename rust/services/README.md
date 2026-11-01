@@ -2,7 +2,7 @@
 
 *Typed Tempo RPC requests and native `0x76` transactions for the Allowit server*
 
-This small crate gives the Allowit server a Tempo vocabulary: typed JSON-RPC requests and one strict native transaction envelope. The server keeps every decision that matters, including policy admission, signer selection, journals, budgets and recovery. This crate only shapes the bytes. It builds on the `service` and `transport` modules of the `allowit-sdk` core crate from the [Allowit SDK](https://github.com/allowit-hq/allowit-sdk).
+This small crate gives the Allowit server a Tempo vocabulary: typed JSON-RPC requests and one strict native transaction envelope. The server keeps every decision that matters, including policy admission, signer selection, journals, budgets and recovery. This crate only shapes the bytes. It builds on the `service` and `transport` modules of [Allowit core](https://github.com/allowit-hq/allowit-core) (package `allowit-sdk`).
 
 ## What is inside
 
@@ -31,7 +31,7 @@ The envelope deliberately refuses sponsorship, access-key authorization, delegat
 
 ## Build and test
 
-Rust 1.98 with `rustfmt` and `clippy`:
+Rust 1.98 with `rustfmt` and `clippy`. The crate is a member of the `rust/` Cargo workspace and uses its lockfile:
 
 ```sh
 cargo fmt --manifest-path rust/services/Cargo.toml --check

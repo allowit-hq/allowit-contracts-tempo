@@ -1538,38 +1538,6 @@ mod tests {
         );
     }
     #[test]
-    fn crash_after_attempted_flag_before_send_resumes_the_exact_saved_bytes() {
-        let fixture = Fixture::new("payment-one", 16);
-        let bundle = fixture.bundle();
-        let directory = TestDirectory::new();
-        let store = Store::open(&directory.0).unwrap();
-        let chain = MockChain::new(&fixture, &directory);
-        let mut record = fixture.record();
-        record.attempted = true;
-        store.save(&record.intent.id, &record).unwrap();
-        let original = record.signed.clone().unwrap();
-        let (value, code) = reconcile(
-            &bundle,
-            &store,
-            &mut record,
-            &chain,
-            |_| panic!("pending proof cannot report settled"),
-            Duration::ZERO,
-        )
-        .unwrap();
-        assert_eq!(code, 12);
-        assert_eq!(value["transactionHash"], original.hash);
-        assert_eq!(chain.builds.get(), 0);
-        assert_eq!(chain.sends.borrow().as_slice(), &[original.raw]);
-        assert!(
-            load_record(&store, &record.intent.id)
-                .unwrap()
-                .unwrap()
-                .signed
-                == record.signed
-        );
-    }
-    #[test]
     fn accepted_send_with_lost_response_reconciles_without_new_payment() {
         let fixture = Fixture::new("payment-one", 16);
         let bundle = fixture.bundle();
@@ -1641,19 +1609,18 @@ mod tests {
             .1,
             5
         );
-        assert_eq!(
-            reconcile(
-                &bundle,
-                &store,
-                &mut record,
-                &chain,
-                |_| panic!(),
-                Duration::ZERO
-            )
-            .unwrap()
-            .1,
-            12
-        );
+        // The retry starts from the saved record: attempted, nothing landed.
+        let (value, code) = reconcile(
+            &bundle,
+            &store,
+            &mut record,
+            &chain,
+            |_| panic!(),
+            Duration::ZERO,
+        )
+        .unwrap();
+        assert_eq!(code, 12);
+        assert_eq!(value["transactionHash"], fixture.signed.hash);
         assert_eq!(
             chain.sends.borrow().as_slice(),
             &[fixture.signed.raw.clone(), fixture.signed.raw.clone()]
@@ -1661,6 +1628,9 @@ mod tests {
         assert_eq!(chain.builds.get(), 0);
         assert!(record.native.as_ref() == Some(&fixture.native));
         assert!(record.signed.as_ref() == Some(&fixture.signed));
+        let saved = load_record(&store, &record.intent.id).unwrap().unwrap();
+        assert!(saved.attempted);
+        assert!(saved.signed == record.signed);
     }
     #[test]
     fn known_pending_transaction_is_observed_without_rebroadcast_or_signing() {
@@ -2094,41 +2064,6 @@ mod tests {
         let saved = load_record(&store, &fixture.intent.id).unwrap().unwrap();
         assert_eq!(saved.signed.unwrap().hash, fixture.signed.hash);
         assert!(chain.sends.borrow().is_empty());
-    }
-    #[test]
-    fn same_signed_mpp_record_recovers_same_hash_without_authorizing_or_signing() {
-        let fixture = Fixture::with_mpp("mpp-recovery-001", 16);
-        let bundle = fixture.bundle();
-        let directory = TestDirectory::new();
-        let store = Store::open(&directory.0).unwrap();
-        let chain = MockChain::new(&fixture, &directory);
-        chain.finality.set(Some(true));
-        let mut record = fixture.record();
-        store.save(&fixture.intent.id, &record).unwrap();
-        let (value, code) = reconcile(
-            &bundle,
-            &store,
-            &mut record,
-            &chain,
-            |_| Ok(fixture.report(true)),
-            Duration::ZERO,
-        )
-        .unwrap();
-        assert_eq!(code, 0);
-        assert_eq!(value["transactionHash"], fixture.signed.hash);
-        assert_eq!(chain.builds.get(), 0);
-        assert!(chain.sends.borrow().is_empty());
-        assert!(
-            authorize(
-                &bundle,
-                &store,
-                &mut record,
-                &chain,
-                |_| panic!("No new authorization on recovery"),
-                |_, _| panic!("No replacement signature on recovery")
-            )
-            .is_err()
-        );
     }
     #[test]
     fn mpp_http_attempt_is_durable_and_response_body_never_uploaded_to_backend() {

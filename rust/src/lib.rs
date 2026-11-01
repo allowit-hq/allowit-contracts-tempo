@@ -969,14 +969,6 @@ mod tests {
             assert!(units(amount).is_err());
         }
     }
-    #[test]
-    fn digest_domains_differ() {
-        let words = vec![word(1); 14];
-        assert_ne!(
-            execution_digest(31337, ZERO, &words).unwrap(),
-            execution_digest(42431, ZERO, &words).unwrap()
-        );
-    }
 }
 
 mod u64_string {

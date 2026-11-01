@@ -53,26 +53,23 @@ git clone https://github.com/allowit-hq/allowit-contracts-tempo.git
 cd allowit-contracts-tempo
 ```
 
-Install the pinned libraries. The exact revisions are recorded in [`dependencies.lock.json`](dependencies.lock.json):
+Install the pinned libraries and build. [`dependencies.lock.json`](dependencies.lock.json) pins each library by full commit, and `scripts/build.sh` installs exactly those commits into `lib/` (it needs `forge` and `jq`):
 
 ```sh
-forge install --no-git openzeppelin-contracts=OpenZeppelin/openzeppelin-contracts@rev=fcbae5394ae8ad52d8e580a3477db99814b9d565
-forge install --no-git forge-std=foundry-rs/forge-std@rev=0258fe875e1d8e207c1eb7175e542ea32356773c
-forge install --no-git tempo-std=tempoxyz/tempo-std@rev=701c4bf8d8d275f44c025b4686b42a82a83a3184
+scripts/build.sh
 ```
 
-Build, lint and test on the Tempo runtime:
+Lint and test on the Tempo runtime:
 
 ```sh
-forge build
 forge fmt --check
 forge test --network tempo -vv
 ```
 
 > [!TIP]
-> `forge test --network tempo` runs the Tempo precompiles, so the suite in [`test/TempoNative.t.sol`](test/TempoNative.t.sol) can create a real TIP-20 token, pause it, blacklist a recipient and prove the vault rolls back cleanly each time. For a local node, run `anvil --network tempo --host 127.0.0.1`.
+> `forge test --network tempo` runs the Tempo precompiles, so the suite in [`test/TempoNative.t.sol`](test/TempoNative.t.sol) can create a real TIP-20 token, blacklist a recipient and prove the vault rolls back cleanly each time. For a local node, run `anvil --network tempo --host 127.0.0.1`.
 
-The test suite covers authorization, every binding substitution, replay, nonce order, expiry boundaries, the five-minute attestation window, total and daily caps across day rollover, fixed recipients, semantic assessments, tuning, revocation, owner recovery, token failures, reentrancy, factory atomicity and fuzzed conservation. Two invariants check that caps and nonces always hold and that tokens are conserved with owner-only recovery.
+The test suite covers authorization, every binding substitution, replay, nonce order, expiry boundaries, the five-minute attestation window, total and daily caps across day rollover, fixed recipients, semantic assessments, tuning, revocation, owner recovery, token failures, reentrancy, factory atomicity and conservation. Two invariants check that caps and nonces always hold and that tokens are conserved with owner-only recovery.
 
 ## Deploy to Moderato testnet
 
@@ -203,6 +200,21 @@ When you read `getState()`, treat `spentToday` as zero if `spendDay` is behind t
 
 ## Rust crates
 
+### Build and pins
+
+`rust/` is one Cargo workspace with one lockfile and one version: `allowit-tempo` and its member `allowit-tempo-services`. [Allowit core](https://github.com/allowit-hq/allowit-core) (package `allowit-sdk`) is the only git dependency. It is declared once in `rust/Cargo.toml`, and `[workspace.metadata.allowit.track]` says which commit it must be pinned to: `"head"` (the default branch tip), `{ branch = "name" }` or `{ version = "1.2.3" }` (tag `v1.2.3`).
+
+```sh
+scripts/build.sh            # fail on a stale allowit-core pin or a second copy of a git package in rust/Cargo.lock, then build the Rust workspace and the contracts
+scripts/build.sh --check    # only check the pin and rust/Cargo.lock
+scripts/build.sh --update   # move a stale pin to its tracked commit, refresh rust/Cargo.lock, then build
+scripts/build.sh --update allowit-core   # move only the pins of the named repositories
+```
+
+Every mode fails when `rust/Cargo.lock` no longer matches the manifests.
+
+The script needs `git`, `cargo`, `jq` and `forge`.
+
 ### `allowit-tempo` (vendor crate)
 
 [`rust/`](rust/README.md) verifies Tempo plans against exact configuration, policy and transaction bindings, validates MPP challenges and, with the `client` feature, signs and sends payments as the designated executor with a durable journal for recovery.
@@ -229,11 +241,11 @@ cargo test --manifest-path rust/services/Cargo.toml --locked
 ```
 src/                      Solidity vault and factory
 test/                     Foundry unit, invariant and native Tempo tests
-scripts/                  Moderato deployment scripts and their offline tests
+scripts/                  build.sh, Moderato deployment scripts and their offline tests
 rust/                     allowit-tempo vendor crate (verification + executor client)
 rust/services/            allowit-tempo-services host protocol crate
 docs/                     Vault lifecycle and transaction validation notes
-.github/workflows/        contracts, runtime smoke, Rust vendor and services CI
+.github/workflows/        contracts, runtime smoke and Rust CI
 foundry.toml              Solidity 0.8.30, osaka EVM, via-IR, Tempo mode on
 dependencies.lock.json    Pinned Foundry library revisions
 ```
@@ -242,7 +254,8 @@ dependencies.lock.json    Pinned Foundry library revisions
 
 Allowit policies are written in a restricted subset of Rust and run on a deterministic interpreter. Each rail enforces the result on its own chain, and this repository is the Tempo rail. Its siblings:
 
-- [allowit-sdk](https://github.com/allowit-hq/allowit-sdk) - the policy language, compiler, deterministic interpreter, CLI and language server. The Rust crates here depend on its `allowit-sdk` core crate (`core/`) for shared client, service and transport primitives.
+- [allowit-core](https://github.com/allowit-hq/allowit-core) - the policy language, compiler and deterministic interpreter. The Rust crates here depend on it (package `allowit-sdk`) for shared client, service and transport primitives.
+- [allowit-sdk](https://github.com/allowit-hq/allowit-sdk) - the `allowit` CLI and the engine. They depend on the Rust crates here and on allowit-core. Pins point one way: allowit-sdk depends on this repository, and this repository depends only on allowit-core.
 - [allowit-cli](https://github.com/allowit-hq/allowit-cli) - the Go command-line client for evaluating and executing actions under a policy.
 - [allowit-contracts-stellar](https://github.com/allowit-hq/allowit-contracts-stellar) - policy vaults and factory for Stellar.
 - [allowit-contracts-solana](https://github.com/allowit-hq/allowit-contracts-solana) - policy evaluator and custody vault for Solana.
@@ -259,7 +272,7 @@ Allowit policies are written in a restricted subset of Rust and run on a determi
 
 ## Contributing
 
-Issues and pull requests are welcome. Before you open one, run the same checks CI runs: `forge fmt --check`, `forge build`, `forge test --network tempo`, `npm run test:deployment`, and the Cargo commands above for the crates you touched. Keep the pinned dependency revisions unless the change is about updating them.
+Issues and pull requests are welcome. Before you open one, run the same checks CI runs: `scripts/build.sh`, `forge fmt --check`, `forge test --network tempo`, `npm run test:deployment`, and the Cargo commands above for the crates you touched. Keep the pinned dependency revisions in `dependencies.lock.json` unless the change is about updating them.
 
 ## License
 

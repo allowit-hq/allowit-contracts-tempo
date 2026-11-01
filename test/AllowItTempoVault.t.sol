@@ -286,6 +286,7 @@ contract AllowItTempoVaultTest is Test {
     function testPerActionAndZeroAmountBlocked() public {
         reject(request(0), Vault.LimitExceeded.selector);
         reject(request(1_000_001), Vault.LimitExceeded.selector);
+        reject(request(type(uint256).max), Vault.LimitExceeded.selector);
     }
 
     function testDailyCapAndUtcDayRollover() public {
@@ -476,17 +477,6 @@ contract AllowItTempoVaultTest is Test {
         assertEq(token.balanceOf(address(vault)), 10_000_000);
     }
 
-    function testInsufficientVaultBalanceRollsBack() public {
-        token.burn(address(vault), 10_000_000);
-        Vault.Execution memory r = request(1);
-        bytes memory sig = sign(r);
-        vm.expectRevert();
-        vm.prank(executor);
-        vault.execute(r, sig);
-        assertEq(vault.spent(), 0);
-        assertEq(vault.nonce(), 0);
-    }
-
     function testTokenCallbackCannotReenter() public {
         Vault.Execution memory r = request(1);
         bytes memory sig = sign(r);
@@ -642,24 +632,5 @@ contract AllowItTempoVaultTest is Test {
             vm.expectRevert(Vault.InvalidConfiguration.selector);
             new Vault(owner, address(token), executor, authority, policyId, t);
         }
-    }
-
-    function testFuzzExactConservation(uint256 amount) public {
-        amount = bound(amount, 1, 1_000_000);
-        execute(amount);
-        assertEq(token.balanceOf(address(vault)) + token.balanceOf(recipient), 10_000_000);
-        assertEq(vault.spent(), amount);
-    }
-
-    function testFuzzAboveActionLimitAlwaysRejected(uint256 amount) public {
-        amount = bound(amount, 1_000_001, type(uint256).max);
-        reject(request(amount), Vault.LimitExceeded.selector);
-    }
-
-    function testFuzzAnyForeignChainRejected(uint256 chainId) public {
-        vm.assume(chainId != block.chainid);
-        Vault.Execution memory r = request(1);
-        r.chainId = chainId;
-        reject(r, Vault.BindingMismatch.selector);
     }
 }

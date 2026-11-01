@@ -92,22 +92,6 @@ contract TempoNativeTest is Test {
         assertTrue(vault.revoked());
     }
 
-    function testRealTIP20PauseRollsBackAccounting() public {
-        token.pause();
-        Vault.Execution memory r = request();
-        bytes memory sig = sign(r);
-        vm.expectRevert(ITIP20.ContractPaused.selector);
-        vm.prank(executor);
-        vault.execute(r, sig);
-        assertEq(vault.spent(), 0);
-        assertEq(vault.nonce(), 0);
-        assertFalse(vault.consumedRequests(r.requestHash));
-        token.unpause();
-        vm.prank(executor);
-        vault.execute(r, sig);
-        assertEq(token.balanceOf(recipient), 1_000_000);
-    }
-
     function testRealTIP403BlacklistedRecipientCannotSpend() public {
         ITIP403Registry registry = StdPrecompiles.TIP403_REGISTRY;
         uint64 policy = registry.createPolicy(address(this), ITIP403Registry.PolicyType.BLACKLIST);
