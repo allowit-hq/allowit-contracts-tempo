@@ -252,11 +252,27 @@ dependencies.lock.json    Pinned Foundry library revisions
 
 ## The Allowit family
 
-Allowit policies are written in a restricted subset of Rust and run on a deterministic interpreter. Each rail enforces the result on its own chain, and this repository is the Tempo rail. Its siblings:
+Vendor packages own native contracts, signing and chain semantics. SDK engine owns shared workflows.
+Core owns common types, policy rules and primitives.
 
-- [allowit-core](https://github.com/allowit-hq/allowit-core) - the policy language, compiler and deterministic interpreter. The Rust crates here depend on it (package `allowit-sdk`) for shared client, service and transport primitives.
-- [allowit-sdk](https://github.com/allowit-hq/allowit-sdk) - the `allowit` CLI and the engine. They depend on the Rust crates here and on allowit-core. Pins point one way: allowit-sdk depends on this repository, and this repository depends only on allowit-core.
-- [allowit-cli](https://github.com/allowit-hq/allowit-cli) - the Go command-line client for evaluating and executing actions under a policy.
+```mermaid
+flowchart TB
+    Engine["[allowit-sdk]<br/>crate @allowit/sdk/engine<br/>All other shared logic"]
+    Vendor["crate + npm @allowit/vendor/*<br/>Native contracts · signing · chain semantics<br/>SVG graphics · web components"]
+    Core["[allowit-core]<br/>crate + npm @allowit/sdk/core<br/>Common types · policy rules · primitives<br/>TypeScript interfaces"]
+    Engine -->|crate| Vendor
+    Engine -->|crate| Core
+    Vendor -->|crate + npm| Core
+```
+
+Solid arrows are dependencies. Dashed arrows are runtime calls / connections.
+This view follows the [canonical responsibility diagram][responsibility-model].
+Use the [Rust manifest](rust/Cargo.toml) for Rust build package names.
+
+Related repositories:
+
+- [allowit-core](https://github.com/allowit-hq/allowit-core) - common types, policy rules, primitives and TypeScript interfaces.
+- [allowit-sdk](https://github.com/allowit-hq/allowit-sdk) - CLI developer workflows, client validation and shared SDK engine logic.
 - [allowit-contracts-stellar](https://github.com/allowit-hq/allowit-contracts-stellar) - policy vaults and factory for Stellar.
 - [allowit-contracts-solana](https://github.com/allowit-hq/allowit-contracts-solana) - policy evaluator and custody vault for Solana.
 - [allowit.xyz](https://allowit.xyz) - the story, in full.
@@ -277,3 +293,5 @@ Issues and pull requests are welcome. Before you open one, run the same checks C
 ## License
 
 The contracts, scripts and the `allowit-tempo` crate are released under the [MIT License](LICENSE). The `allowit-tempo-services` crate carries `LicenseRef-Proprietary` in its [`Cargo.toml`](rust/services/Cargo.toml); see that crate's [README](rust/services/README.md).
+
+[responsibility-model]: https://github.com/allowit-hq/allowit-project/blob/main/wiki/allowit/architecture.md#dependency-direction

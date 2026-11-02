@@ -2,7 +2,13 @@
 
 *Verify, sign and deliver Tempo payments for an Allowit vault*
 
-This crate is the Rust side of the [Allowit Tempo rail](../README.md). It owns plan verification, native `0x76` transactions, executor recovery, MPP challenge validation and paid HTTP delivery. The Allowit SDK CLI calls into it through `cli/vendors/tempo`. The crate uses shared client primitives from [Allowit core](https://github.com/allowit-hq/allowit-core) (package `allowit-sdk`, `client` feature) and never depends on the SDK CLI or engine.
+This crate exposes Tempo plan validation, native `0x76` transactions and MPP challenge validation.
+Its `client` feature exposes its executor interface. Native signing and chain semantics belong to vendor packages.
+SDK engine owns shared execution, recovery and delivery workflows.
+See the [canonical responsibility diagram][responsibility-model].
+
+The crate uses shared client primitives from its [pinned Core dependency](Cargo.toml) (package `allowit-sdk`, `client` feature).
+It does not depend on the SDK CLI or engine.
 
 ## Two ways to build it
 
@@ -69,3 +75,5 @@ src/tempo-usage.txt        Command and configuration reference
 ## License
 
 MIT, see the repository [LICENSE](../LICENSE).
+
+[responsibility-model]: https://github.com/allowit-hq/allowit-project/blob/main/wiki/allowit/architecture.md#dependency-direction
