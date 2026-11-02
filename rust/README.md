@@ -5,7 +5,7 @@
 This crate exposes Tempo plan validation, native `0x76` transactions and MPP challenge validation.
 Its `client` feature exposes its executor interface. Native signing and chain semantics belong to vendor packages.
 SDK engine owns shared execution, recovery and delivery workflows.
-See the [canonical responsibility diagram][responsibility-model].
+[Architecture](../README.md#the-allowit-family).
 
 The crate uses shared client primitives from its [pinned Core dependency](Cargo.toml) (package `allowit-sdk`, `client` feature).
 It does not depend on the SDK CLI or engine.
@@ -75,5 +75,3 @@ src/tempo-usage.txt        Command and configuration reference
 ## License
 
 MIT, see the repository [LICENSE](../LICENSE).
-
-[responsibility-model]: https://github.com/allowit-hq/allowit-project/blob/main/wiki/allowit/architecture.md#dependency-direction

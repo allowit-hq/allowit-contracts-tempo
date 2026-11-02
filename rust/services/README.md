@@ -5,7 +5,7 @@
 This crate supplies typed Tempo JSON-RPC requests and a strict native transaction envelope.
 The server retains trusted policy admission, signer authority and private budgets.
 SDK engine owns shared execution and recovery workflows. Vendor packages own native encoding, signing and chain semantics.
-See the [canonical responsibility diagram][responsibility-model].
+[Architecture](../../README.md#the-allowit-family).
 
 The crate uses `service` and `transport` modules from its [pinned Core dependency](../Cargo.toml) (package `allowit-sdk`).
 
@@ -47,5 +47,3 @@ cargo test --manifest-path rust/services/Cargo.toml --locked
 ## Provenance and license
 
 The transaction implementation is copied from the Allowit engine. Its source repository, revision and path are recorded under `[package.metadata.allowit-source]` in [`Cargo.toml`](Cargo.toml). The crate declares `LicenseRef-Proprietary`; the rest of this repository is [MIT](../../LICENSE).
-
-[responsibility-model]: https://github.com/allowit-hq/allowit-project/blob/main/wiki/allowit/architecture.md#dependency-direction
