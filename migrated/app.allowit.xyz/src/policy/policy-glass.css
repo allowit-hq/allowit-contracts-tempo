@@ -1,0 +1,289 @@
+/* Workspace glass. Visual layer over styles.css: the shell (top bar, sidebar edge), sign-in wallets, the composer
+   and the selected policy. Subtle-glass direction from Igor's (Magurin) PR #6, kept to panels and controls.
+   The certificate geometry and the sidebar mini-certificate are never targeted: the certificate's head and tips
+   paint opaque var(--field) patches, so the page field stays plain paper and only panels and controls around it lift.
+   Badge faces and tips get an opaque glass surface only; their size, placement and icons are unchanged.
+   Tokens follow the three theme states (light, auto-dark, explicit dark) like styles.css. */
+
+:where(.shell) {
+  --g-radius: 18px;
+  --g-radius-control: 10px;
+  --g-line: rgba(17, 17, 16, 0.08);
+  --g-line-strong: rgba(17, 17, 16, 0.25);
+  --g-hi: rgba(255, 255, 255, 0.92);
+  --g-panel: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5));
+  --g-panel-shadow: inset 0 1px 0 var(--g-hi), 0 1px 2px rgba(17, 17, 16, 0.04), 0 18px 44px -30px rgba(17, 17, 16, 0.3);
+  --g-btn: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.55));
+  --g-btn-hover: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.7));
+  --g-btn-shadow: inset 0 1px 0 var(--g-hi), 0 1px 2px rgba(17, 17, 16, 0.07), 0 6px 14px -10px rgba(17, 17, 16, 0.32);
+  --g-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 60%);
+  --g-sheen-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 1px 2px rgba(17, 17, 16, 0.12), 0 8px 18px -12px rgba(17, 17, 16, 0.5);
+  --g-field: rgba(255, 255, 255, 0.72);
+  --g-well: rgba(17, 17, 16, 0.035);
+  --g-well-shadow: inset 0 1px 2px rgba(17, 17, 16, 0.06);
+  --g-ring: rgba(17, 17, 16, 0.12);
+  --g-bar: rgba(250, 250, 247, 0.92);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) :where(.shell) {
+    --g-line: rgba(250, 250, 247, 0.1);
+    --g-line-strong: rgba(250, 250, 247, 0.28);
+    --g-hi: rgba(255, 255, 255, 0.07);
+    --g-panel: linear-gradient(180deg, rgba(250, 250, 247, 0.06), rgba(250, 250, 247, 0.025));
+    --g-panel-shadow: inset 0 1px 0 var(--g-hi), 0 1px 2px rgba(0, 0, 0, 0.3), 0 18px 44px -28px rgba(0, 0, 0, 0.75);
+    --g-btn: linear-gradient(180deg, rgba(250, 250, 247, 0.1), rgba(250, 250, 247, 0.04));
+    --g-btn-hover: linear-gradient(180deg, rgba(250, 250, 247, 0.15), rgba(250, 250, 247, 0.07));
+    --g-btn-shadow: inset 0 1px 0 var(--g-hi), 0 1px 2px rgba(0, 0, 0, 0.35), 0 6px 14px -10px rgba(0, 0, 0, 0.7);
+    --g-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 60%);
+    --g-sheen-shadow: inset 0 -1px 0 rgba(17, 17, 16, 0.18), 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 18px -12px rgba(0, 0, 0, 0.8);
+    --g-field: rgba(250, 250, 247, 0.04);
+    --g-well: rgba(250, 250, 247, 0.04);
+    --g-well-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+    --g-ring: rgba(250, 250, 247, 0.16);
+    --g-bar: rgba(17, 17, 16, 0.92);
+  }
+}
+:root[data-theme='dark'] :where(.shell) {
+  --g-line: rgba(250, 250, 247, 0.1);
+  --g-line-strong: rgba(250, 250, 247, 0.28);
+  --g-hi: rgba(255, 255, 255, 0.07);
+  --g-panel: linear-gradient(180deg, rgba(250, 250, 247, 0.06), rgba(250, 250, 247, 0.025));
+  --g-panel-shadow: inset 0 1px 0 var(--g-hi), 0 1px 2px rgba(0, 0, 0, 0.3), 0 18px 44px -28px rgba(0, 0, 0, 0.75);
+  --g-btn: linear-gradient(180deg, rgba(250, 250, 247, 0.1), rgba(250, 250, 247, 0.04));
+  --g-btn-hover: linear-gradient(180deg, rgba(250, 250, 247, 0.15), rgba(250, 250, 247, 0.07));
+  --g-btn-shadow: inset 0 1px 0 var(--g-hi), 0 1px 2px rgba(0, 0, 0, 0.35), 0 6px 14px -10px rgba(0, 0, 0, 0.7);
+  --g-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 60%);
+  --g-sheen-shadow: inset 0 -1px 0 rgba(17, 17, 16, 0.18), 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 18px -12px rgba(0, 0, 0, 0.8);
+  --g-field: rgba(250, 250, 247, 0.04);
+  --g-well: rgba(250, 250, 247, 0.04);
+  --g-well-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+  --g-ring: rgba(250, 250, 247, 0.16);
+  --g-bar: rgba(17, 17, 16, 0.92);
+}
+
+/* Top bar: content scrolls under a frosted edge. Opaque where blur or transparency is unavailable or unwanted. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .shell .top {
+    background: var(--g-bar);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    backdrop-filter: blur(18px) saturate(1.4);
+  }
+}
+.shell .theme { border-color: var(--g-line-strong); border-radius: 50%; background-image: var(--g-btn); box-shadow: var(--g-btn-shadow); }
+.shell .theme button { border-radius: inherit; }
+.shell .net-trigger { border-color: var(--g-line-strong); border-radius: 999px; background-color: var(--g-field); box-shadow: inset 0 1px 0 var(--g-hi); }
+.shell .net-trigger:not(:disabled):hover,
+.shell .net-trigger[aria-expanded='true'] { border-color: color-mix(in srgb, var(--ink) 38%, transparent); }
+/* The list stays opaque: a nested backdrop blur inside the frosted bar would only sample the bar itself. */
+.shell .net-list { padding: 5px; border-color: var(--g-line-strong); border-radius: 12px; background-color: var(--field); background-image: var(--g-btn); box-shadow: var(--g-panel-shadow); }
+.shell .net-option { border-radius: 8px; }
+
+/* Sidebar: an edge only, on every screen. Items and their mini-certificates keep their own surface. */
+.shell .policy-nav { box-shadow: inset -1px 0 0 var(--g-line); }
+.shell .policy-nav-heading .icon-action { border-radius: 50%; }
+.shell .policy-nav-heading .icon-action:hover { background-image: var(--g-btn); box-shadow: var(--g-btn-shadow); }
+
+/* Before a policy is selected: the same panel, button and field recipes. The page field stays plain paper. */
+.shell .compose-surface,
+.shell .wallet-none {
+  border-color: var(--g-line);
+  background-image: var(--g-panel);
+  box-shadow: var(--g-panel-shadow);
+}
+.shell .compose-surface:focus-within { border-color: var(--g-line-strong); box-shadow: var(--g-panel-shadow), 0 0 0 2px var(--g-ring); }
+.shell .example,
+.shell .wallet {
+  border-color: var(--g-line-strong);
+  background-image: var(--g-btn);
+  box-shadow: var(--g-btn-shadow);
+}
+.shell .wallet { border-radius: 14px; }
+.shell .example:not(:disabled, [aria-pressed='true']):hover,
+.shell .wallet:not(:disabled):hover { border-color: color-mix(in srgb, var(--ink) 38%, transparent); background-image: var(--g-btn-hover); }
+.shell .example[aria-pressed='true'] { border-color: var(--ink); background-image: var(--g-sheen); box-shadow: var(--g-sheen-shadow); }
+.shell .example:disabled,
+.shell .wallet:disabled { box-shadow: none; }
+.shell .compose-send { background-image: var(--g-sheen); box-shadow: var(--g-sheen-shadow); }
+.shell .compose-send:disabled { box-shadow: none; }
+
+/* Panels */
+.policy .policy-controls > .section,
+.policy .policy-controls .tempo-vault-panel > .section,
+.policy #p-summary > .code,
+.policy .workflow-panel,
+.policy #panel-agent,
+.policy .legacy {
+  border: 1px solid var(--g-line);
+  border-radius: var(--g-radius);
+  background-image: var(--g-panel);
+  box-shadow: var(--g-panel-shadow);
+}
+.policy .policy-controls > .section,
+.policy .policy-controls .tempo-vault-panel > .section { margin-top: 16px; padding: 18px 22px 22px; }
+.policy .policy-controls > .section:first-child { margin-top: 0; }
+.policy #p-summary > .code { padding: 4px 20px 20px; }
+.policy #p-summary > .code + .code { margin-top: 16px; }
+.policy .workflow-panel { padding: 18px 18px 20px 20px; }
+.policy #panel-agent { margin-top: 16px; padding: 20px 22px 22px; }
+.policy #panel-agent:focus-visible { outline-offset: 2px; }
+.policy .legacy { border-left: 3px solid var(--trace); }
+.policy .policy-controls > .section .section-title,
+.policy .policy-controls .tempo-vault-panel > .section .section-title { margin-bottom: 12px; }
+/* One rhythm inside a policy section: notes, actions and panels never touch. Spacing set for a specific block still wins. */
+.policy .policy-controls > .section > p + p,
+.policy .policy-controls .tempo-vault-panel > .section > p + p { margin-top: 8px; }
+.policy .policy-controls > .section > :is(p, .btn-row, .facts, .service-picker) + :is(.btn-row, .facts, .service-picker),
+.policy .policy-controls > .section > :is(.btn-row, .facts, .service-picker) + p,
+.policy .policy-controls .tempo-vault-panel > .section > :is(p, .btn-row, .facts, .service-picker) + :is(.btn-row, .facts, .service-picker),
+.policy .policy-controls .tempo-vault-panel > .section > :is(.btn-row, .facts, .service-picker) + p { margin-top: 14px; }
+/* At any depth, an action never sits on the text, field or panel above it, and a note never sits on the action. */
+.policy .policy-controls .section :is(p, dl, ul, ol, pre, details, textarea, .field, .tempo-notice, .native-review, .native-setup-blockers, .skill-file) + :is(.btn-row, .btn) { margin-top: 14px; }
+.policy .policy-controls .section :is(.btn-row, .section > .btn) + :is(p:not(:empty), dl) { margin-top: 12px; }
+
+/* Wells: code, payloads and skill source sit recessed inside the panels. */
+.policy .policy-code pre,
+.policy .agent-step-detail,
+.policy .skill-source,
+.policy .preference-schema pre {
+  border: 1px solid var(--g-line);
+  border-radius: 12px;
+  background: var(--g-well);
+  box-shadow: var(--g-well-shadow);
+}
+
+/* Metadata chips */
+.policy .policy-metadata > span,
+.policy .policy-metadata > .link-btn {
+  min-height: 26px;
+  padding: 3px 10px;
+  border: 1px solid var(--g-line);
+  border-radius: 999px;
+  background-image: var(--g-btn);
+  box-shadow: inset 0 1px 0 var(--g-hi);
+}
+
+/* Tabs: a glass track; the selected view is raised and keeps its red trace. */
+.policy .policy-tabs {
+  width: fit-content;
+  max-width: 100%;
+  margin: 20px 0 0;
+  padding: 4px;
+  gap: 2px;
+  border: 1px solid var(--g-line);
+  border-radius: 14px;
+  background: var(--g-well);
+  box-shadow: var(--g-well-shadow);
+}
+.policy .policy-tab { min-height: 40px; margin: 0; padding: 0 14px; border: 0; border-radius: 999px; }
+.policy .policy-tab[aria-selected='true'] {
+  border: 0;
+  background: linear-gradient(var(--trace), var(--trace)) center bottom / calc(100% - 28px) 2px no-repeat, var(--g-btn);
+  box-shadow: var(--g-btn-shadow);
+}
+.policy .policy-tab:focus-visible { outline-offset: 1px; }
+
+/* Buttons: base colours stay; glass is a layered image, a softer edge on plain buttons and an inset highlight. */
+.policy .btn { border-radius: 999px; background-image: var(--g-btn); box-shadow: var(--g-btn-shadow); }
+.policy .btn-sm { border-radius: 999px; }
+.policy .btn-primary { --g-btn: var(--g-sheen); --g-btn-hover: var(--g-sheen); --g-btn-shadow: var(--g-sheen-shadow); }
+/* Destructive actions keep solid, contrasting colours instead of a lightening sheen. */
+.policy .btn-danger { --g-btn: none; --g-btn-hover: none; }
+.policy .btn-danger.btn-primary { background-color: #ba2d22; }
+.policy :where(.btn:not(.btn-primary, .btn-danger)) { border-color: var(--g-line-strong); }
+.policy :where(.btn:not(.btn-primary, .btn-danger):not(:disabled):hover) { border-color: color-mix(in srgb, var(--ink) 38%, transparent); }
+.policy .btn:not(:disabled):hover { background-image: var(--g-btn-hover); }
+.policy .btn:not(.btn-primary):not(:disabled):active { background-image: none; box-shadow: var(--g-well-shadow); }
+.policy .btn:disabled { box-shadow: none; }
+.policy .btn:focus-visible { outline-offset: 2px; }
+.policy .policy-actions { gap: 6px; }
+.policy .policy-actions .icon-action {
+  border: 1px solid var(--g-line);
+  border-radius: 50%;
+  background-image: var(--g-btn);
+  box-shadow: var(--g-btn-shadow);
+}
+.policy .policy-actions .icon-action:not(:disabled):hover { color: var(--ink); background-image: var(--g-btn-hover); border-color: var(--g-line-strong); }
+.policy .policy-actions .icon-action:disabled { opacity: 0.45; box-shadow: none; }
+
+/* Fields. Range sliders and checkboxes keep their own drawing. */
+.policy .field :is(input:not([type='range'], [type='checkbox'], [type='radio']), select),
+.policy .list-select-trigger {
+  border-radius: 999px;
+  background-color: var(--g-field);
+  box-shadow: inset 0 1px 0 var(--g-hi), var(--g-well-shadow);
+}
+.policy .field textarea { border-radius: var(--g-radius-control); background-color: var(--g-field); box-shadow: inset 0 1px 0 var(--g-hi), var(--g-well-shadow); }
+.policy .field :is(input:not([type='range'], [type='checkbox'], [type='radio']), select, textarea):focus,
+.policy .list-select-trigger[aria-expanded='true'] {
+  box-shadow: inset 0 1px 0 var(--g-hi);
+}
+.policy .list-select-trigger { border-color: var(--g-line-strong); }
+.policy .list-select-trigger:not(:disabled):hover,
+.policy .list-select-trigger[aria-expanded='true'] { border-color: color-mix(in srgb, var(--ink) 38%, transparent); }
+.policy .workflow-trace .list-select-trigger { border-radius: 999px; }
+/* Lists match the network list: opaque paper under a glass sheen, so content behind never shows through. */
+.policy .list-select-list { padding: 5px; border-color: var(--g-line-strong); border-radius: 12px; background-color: var(--field); background-image: var(--g-btn); box-shadow: var(--g-panel-shadow); }
+.policy .list-select-option { border-radius: 8px; }
+
+/* Result schema copy: quiet until hovered, then the same raised glass as other icon actions. */
+.policy .preference-schema-copy { border: 1px solid transparent; border-radius: 50%; }
+.policy .preference-schema-copy:hover,
+.policy .preference-schema-copy[data-state='copied'] { border-color: var(--g-line); background-color: transparent; background-image: var(--g-btn); box-shadow: var(--g-btn-shadow); }
+
+/* Certificate badge faces stay opaque over the aperture lines; their circular shape and inset come from styles.css. */
+.policy .policy-certificate .certificate-badge button {
+  border-color: var(--g-line-strong);
+  border-radius: 50%;
+  background: var(--g-btn), var(--field);
+  box-shadow: var(--g-btn-shadow);
+}
+.policy .policy-certificate .certificate-badge button:hover,
+.policy .policy-certificate .certificate-badge.open button { border-color: color-mix(in srgb, var(--ink) 38%, transparent); background: var(--g-btn-hover), var(--field); }
+.policy .policy-certificate .certificate-badge button[aria-current='step'] { border-color: color-mix(in srgb, var(--ink) 42%, transparent); box-shadow: var(--g-btn-shadow); }
+.policy .policy-certificate .certificate-badge button:active { background: linear-gradient(var(--g-well), var(--g-well)), var(--field); box-shadow: var(--g-well-shadow); }
+.policy .policy-certificate .certificate-badge:is([data-state='failed'], [data-state='awaiting_input']) button { border-color: var(--trace); }
+.policy .policy-certificate .certificate-tip { border-color: var(--g-line-strong); border-top-color: var(--trace); border-radius: 8px; background: var(--g-btn), var(--field); box-shadow: var(--g-panel-shadow); }
+
+.policy .meter { border-color: var(--g-line-strong); border-radius: 999px; background: var(--g-well); box-shadow: var(--g-well-shadow); }
+.policy .meter-fill { border-radius: 999px; }
+
+/* Motion: hover settles in, never moves layout. Off under reduced motion (styles.css also stops all transitions). */
+@media (prefers-reduced-motion: no-preference) {
+  .policy .btn,
+  .policy .policy-actions .icon-action,
+  .policy .policy-certificate .certificate-badge button,
+  .policy .preference-schema-copy,
+  .policy .list-select-trigger,
+  .policy .policy-tab,
+  .shell .example,
+  .shell .wallet {
+    transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .shell .top { background: var(--field); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
+@media (max-width: 1023px) {
+  .policy .workflow-panel { padding: 16px; }
+}
+@media (max-width: 719px) {
+  .policy .policy-controls > .section,
+  .policy .policy-controls .tempo-vault-panel > .section,
+  .policy #panel-agent { padding: 16px; }
+  .policy #p-summary > .code { padding: 2px 14px 14px; }
+  .policy .workflow-panel { padding: 14px; }
+  .policy .policy-tabs { width: 100%; }
+  .policy .policy-tab { flex: 1 1 0; justify-content: center; }
+  :where(.shell) { --g-radius: 16px; }
+}
+@media (pointer: coarse) {
+  .policy .btn,
+  .policy .policy-tab,
+  .policy .policy-actions .icon-action { min-height: 44px; }
+  .policy .policy-actions .icon-action { min-width: 44px; }
+}
+@media (forced-colors: active) {
+  .policy .policy-tab[aria-selected='true'] { border-bottom: 2px solid CanvasText; }
+}

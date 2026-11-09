@@ -1,0 +1,60 @@
+/* Tempo renders the shared Allowit workspace; these rules cover only its chain-specific fields. */
+.tempo-source {margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.65;padding:16px;background:var(--wash, transparent);border:1px solid var(--rule);border-radius:var(--radius);max-height:420px;overflow:auto;}
+.tempo-execution {margin:16px 0 0;padding-left:18px;display:grid;gap:8px;line-height:1.55;color:var(--muted);}
+.tempo-vault-fields {margin-top:16px;gap:12px;}
+.tempo-vault-fields .field {margin:0;}
+.tempo-limits {grid-template-columns:repeat(3,minmax(0,1fr));}
+.tempo-own-source summary {cursor:pointer;}
+.tempo-own-source .field {margin-top:8px;}
+.tempo-own-source textarea {min-height:160px;}
+.tempo-review-title {font-weight:600;margin:0 0 8px;}
+.policy-controls .facts + p, .policy-controls .facts + .btn-row {margin-top:12px;}
+@media (max-width:600px) {.tempo-limits {grid-template-columns:1fr;}}
+
+/* Sign-in card */
+.tempo-signin .auth-wallet-name {display:grid;gap:1px;}
+.tempo-wallet-hint {font-size:12px;font-weight:500;color:var(--muted);}
+.tempo-wallet-install {text-decoration:none;}
+.tempo-wallet-install .auth-wallet-name {color:var(--muted);}
+.tempo-wallet-install .auth-wallet-end {display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;}
+.tempo-signin-empty {margin-bottom:12px;}
+.tempo-notice {display:flex;align-items:flex-start;gap:10px;margin:0;padding:12px;border:1px solid var(--rule);border-radius:var(--radius);font-size:13px;line-height:1.5;}
+.tempo-notice[role=alert] {color:var(--red-text);}
+.tempo-notice span {flex:1;min-width:0;overflow-wrap:anywhere;}
+.tempo-vault-panel {min-width:0;}
+.tempo-vault-panel>.tempo-notice+.tempo-notice {margin-top:12px;}
+.tempo-vault-panel .facts dd,.tempo-dialog .facts dd {min-width:0;overflow-wrap:anywhere;}
+.tempo-consent {display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.5;}
+.tempo-consent input {flex:none;margin-top:3px;accent-color:var(--ink);}
+.tempo-wrap {overflow-wrap:anywhere;}
+.tempo-activity li {min-width:0;overflow-wrap:anywhere;}
+.tempo-entry-details {margin:2px 0 8px;}
+.tempo-entry-details>summary {cursor:pointer;color:var(--muted);}
+.tempo-entry-details .facts {margin-top:8px;font-size:12px;}
+.tempo-purchase {margin:4px 0 12px;}
+.tempo-entries {padding:0;margin:16px 0;list-style:none;}
+.tempo-purchase-facts {font-size:12px;gap:8px;}
+.tempo-purchase-facts dd {min-width:0;overflow-wrap:anywhere;}
+.tempo-purchase-note {margin:8px 0 0;font-size:12px;line-height:1.5;}
+.tempo-original {margin-top:16px;}
+.tempo-vault-panel .tempo-notice {margin:12px 0;}
+.tempo-original>summary,.tempo-recovery-vault>summary {cursor:pointer;font-size:13px;line-height:1.5;}
+.tempo-original[open]>summary {margin-bottom:14px;}
+.tempo-original .btn-row {margin-top:12px;}
+.tempo-dialog {width:min(620px,calc(100vw - 32px));max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);margin:auto;padding:24px;overflow:auto;border:1px solid var(--rule-strong);border-radius:var(--radius);background:var(--field);color:var(--ink);}
+.tempo-dialog::backdrop {background:rgba(0,0,0,.4);}
+.tempo-dialog .ca-dialog-heading {display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;}
+.tempo-dialog .ca-dialog-heading h2 {font-size:20px;font-weight:600;margin:0;}
+.tempo-dialog .ca-icon {display:grid;place-items:center;width:36px;height:36px;padding:0;border:1px solid var(--rule);border-radius:var(--radius);background:transparent;color:inherit;cursor:pointer;flex:none;}
+.tempo-dialog .ca-icon:disabled {cursor:default;opacity:.45;}
+.tempo-dialog .form {max-width:none;}
+.tempo-dialog .facts {margin-bottom:16px;}
+.tempo-dialog .btn-row {margin-top:20px;justify-content:flex-end;}
+.tempo-review-note {display:block;font:12px/1.5 var(--sans);color:var(--muted);margin-top:5px;}
+.tempo-flow-status {display:flex;gap:12px;align-items:flex-start;margin:10px 0 16px;}
+.tempo-flow-status p {margin:0;font-weight:600;line-height:1.6;}
+.tempo-flow-status svg {flex:none;margin-top:2px;}
+.tempo-receipt-link {display:inline-flex;align-items:center;gap:5px;margin-top:12px;}
+.tempo-recovery-vault {margin-top:16px;padding-top:16px;border-top:1px solid var(--rule);min-width:0;}
+.tempo-recovery-vault[open]>summary {margin-bottom:16px;}
+@media(max-width:600px) {.tempo-dialog .facts{grid-template-columns:minmax(0,1fr);}.tempo-dialog .facts dd{padding-bottom:12px;}}

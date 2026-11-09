@@ -1,0 +1,86 @@
+.chain-picker {
+  grid-area: chain;
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-width: 0;
+}
+.chain-picker .net-trigger {
+  min-width: 102px;
+  min-height: 36px;
+  padding: 6px 12px;
+  justify-content: space-between;
+  font-size: 12px;
+}
+.chain-picker .net-list {
+  min-width: 156px;
+  z-index: 5;
+}
+.chain-picker .net-option {min-height: 40px;}
+
+/* The chain stays beside the brand in every owner scope; the network has its own column. */
+.auth-top-inner:has(.chain-picker),
+.top-inner:has(.chain-picker),
+.vd .vd-top:has(.chain-picker) {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  grid-template-areas: 'mark chain note aside';
+  column-gap: 16px;
+  align-items: center;
+  padding-inline: clamp(16px, 4vw, 48px);
+}
+.auth-top-inner:has(.chain-picker) > .wordmark,
+.top-inner:has(.chain-picker) > .wordmark,
+.vd .vd-top:has(.chain-picker) > .vd-wordmark {
+  grid-area: mark;
+  font-size: 18px;
+  gap: 8px;
+  white-space: nowrap;
+}
+.auth-top-inner:has(.chain-picker) > .theme,
+.vd .vd-top:has(.chain-picker) > .vd-top-aside {
+  grid-area: aside;
+  justify-self: end;
+}
+.vd .vd-top:has(.chain-picker) > .vd-net {
+  grid-area: note;
+  justify-self: start;
+  white-space: nowrap;
+}
+@media (max-width: 899px) {
+  .top-inner:has(.chain-picker) {column-gap: 10px;}
+}
+/* Two rows keep the chain on the left and leave room for wallet controls at phone widths. */
+@media (max-width: 600px) {
+  :root:has(.chain-picker) {--top: 112px;}
+  .vd:has(.chain-picker) {--vd-top: 112px;}
+  .auth-top-inner:has(.chain-picker),
+  .top-inner:has(.chain-picker),
+  .vd .vd-top:has(.chain-picker) {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: 'mark aside' 'chain note';
+    column-gap: 12px;
+    row-gap: 4px;
+    min-height: 112px;
+    padding: 8px 16px;
+  }
+  .chain-picker .net-trigger {min-height: 40px;}
+  .chain-picker .net-list {max-height: calc(100dvh - 132px);}
+  .vd .vd-top:has(.chain-picker) > .vd-top-aside {gap: 8px;}
+  .vd .vd-top:has(.chain-picker) .vd-session {display: none;}
+  .vd .vd-top:has(.chain-picker) > .net,
+  .top-inner:has(.chain-picker) > .net {justify-self: start;}
+}
+@media (max-width: 360px) {
+  .auth-top-inner:has(.chain-picker),
+  .top-inner:has(.chain-picker),
+  .vd .vd-top:has(.chain-picker) {padding-inline: 12px;}
+  .tempo-workspace .vd-top:has(.chain-picker) > .vd-top-aside > .vd-btn {
+    padding-inline: 8px;
+    font-size: 13px;
+  }
+}
+@media (pointer: coarse) {
+  .chain-picker .net-trigger,
+  .chain-picker .net-option {min-height: 44px;}
+}
